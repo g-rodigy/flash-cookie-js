@@ -1,15 +1,16 @@
-// FlashCookie.js v0.0.1
+// FlashCookie.js v0.1.0
 // JavaScript interface library to manage persistent cross-browser Flash cookies.
 // https://github.com/faisalman/flash-cookie-js
 //
 // Copyright © 2013 Faisalman <fyzlman@gmail.com>
+// Modified rodigy <rodigy.main@gmail.com>
 // Dual licensed under GPLv2 & MIT
 
 ;(function (window) {
     'use strict';
     var movieName = 'FlashCookie';
     var movieURL = 'FlashCookie.swf';
-    var ready = new CustomEvent('ready', {});
+    var ready = new CustomEvent('FlashCookie.ready', {});
     var object = document.createElement('object');
     var param1 = document.createElement('param');
     var param2 = document.createElement('param');
@@ -32,21 +33,40 @@
     embed.height = '400';
     embed.allowscriptaccess = 'sameDomain';
     object.appendChild(embed);
-    document.body.appendChild(object);
-    window.FlashCookie = {};
-    window.FlashCookie.onReady = function (callback) {
-        document.body.addEventListener('ready', function () {
-            callback.call(this, document[movieName]);
-        });
+
+    window.FlashCookie = function(callback) {
+        if (FlashCookie.ready) {
+            FlashCookie.fn(callback);
+        }
+        else {
+           FlashCookie._queue.push(callback);
+        }
     };
+
+    window.FlashCookie._queue = [];
+
+    window.FlashCookie.init = function () {
+        FlashCookie.ready = true;
+        document.body.dispatchEvent(ready);
+    
+        if (FlashCookie._queue) {
+            while (FlashCookie._queue.length) {
+                FlashCookie.fn(this._queue.shift());
+            }
+        }
+    };
+
+    window.FlashCookie.fn = function (callback) {
+        callback.call(FlashCookie, document[movieName]);
+    };
+
     window.FlashCookie.showConsole = function () {
         var object = document.getElementById(movieName);
         object.style.top = 0;
         object.style.left = 0;
     };
-    document.body.onload = function () {
-        setTimeout(function () {
-            document.body.dispatchEvent(ready);
-        }, 200);
-    };
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        document.body.appendChild(object);
+    });
 })(this);

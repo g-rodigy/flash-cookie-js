@@ -22,6 +22,8 @@ package com.faisalman.FlashCookie
                 ExternalInterface.addCallback("remove", this.remove);
                 ExternalInterface.addCallback("get", this.get);
                 ExternalInterface.addCallback("set", this.set);
+
+                ExternalInterface.call("FlashCookie.init()");
             } catch (error:Error) {
                 if (error.errorID == 2060) {
                     this.console.text = "Add " + this.loaderInfo.loaderURL + " to trusted location in http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html";
